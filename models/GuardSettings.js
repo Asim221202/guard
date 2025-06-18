@@ -12,6 +12,9 @@ const GuardSettingsSchema = new mongoose.Schema({
   sunucuKoruma: { type: Boolean, default: false },
   banKoruma: { type: Boolean, default: false },
   botKoruma: { type: Boolean, default: false },
+
+  mesajLog: { type: Boolean, default: false },
+  sesLog: { type: Boolean, default: false },
 });
 
 module.exports = mongoose.model('GuardSettings', GuardSettingsSchema);
