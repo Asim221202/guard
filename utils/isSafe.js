@@ -12,5 +12,9 @@ module.exports = async function isSafe(guild, userID, settings) {
   // Whitelist kontrolü
   if (settings?.whitelist?.includes(userID)) return true;
 
-  return false; // Hiçbiri değilse, güvenli değil
+  // Administrator yetkisi kontrolü (ekstra güvenlik için)
+  const member = guild.members.cache.get(userID);
+  if (member && member.permissions.has('Administrator')) return true;
+
+  return false;
 };
