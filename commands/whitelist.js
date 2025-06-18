@@ -76,7 +76,7 @@ module.exports = {
 
       return interaction.reply({
         content: `📜 Whitelist Listesi:\n${list}`,
-        ephemeral: true
+        ephemeral: false
       });
     }
   }
