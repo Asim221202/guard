@@ -10,7 +10,8 @@ const GuardSettingsSchema = new mongoose.Schema({
   kanalKoruma: { type: Boolean, default: false },
   rolKoruma: { type: Boolean, default: false },
   sunucuKoruma: { type: Boolean, default: false },
-  banKoruma: { type: Boolean, default: false }
+  banKoruma: { type: Boolean, default: false },
+  botKoruma: { type: Boolean, default: false },
 });
 
 module.exports = mongoose.model('GuardSettings', GuardSettingsSchema);
