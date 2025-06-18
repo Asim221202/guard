@@ -29,7 +29,7 @@ module.exports = {
 
     return interaction.reply({
       content: `✅ Guard log kanalı başarıyla ${kanal} olarak ayarlandı.`,
-      ephemeral: true
+      ephemeral: false
     });
   }
 };
