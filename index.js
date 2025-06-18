@@ -90,4 +90,12 @@ mongoose.connect(process.env.MONGO_URL, {
   client.login(process.env.TOKEN);
 }).catch(err => {
   console.error('❌ Mongo bağlantı hatası:', err);
+  // Bu kod sadece Render'ın kafası rahat etsin diye eklenir
+const express = require('express');
+const app = express();
+
+app.get('/', (req, res) => res.send('Bot çalışıyor.'));
+app.listen(process.env.PORT || 3000, () => {
+  console.log('Web sunucusu aktif (sadece Render için).');
+});
 });
