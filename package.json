@@ -1,0 +1,16 @@
+{
+  "name": "guard-bot",
+  "version": "1.0.0",
+  "description": "Discord sunucularını korumak için gelişmiş guard botu",
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js"
+  },
+  "author": "SeninAdın",
+  "license": "MIT",
+  "dependencies": {
+    "discord.js": "^14.14.1",
+    "mongoose": "^7.6.3",
+    "dotenv": "^16.4.5"
+  }
+}
