@@ -44,30 +44,30 @@ module.exports = {
     if (sub === 'ekle') {
       const user = interaction.options.getUser('kullanıcı');
       if (settings.whitelist.includes(user.id)) {
-        return interaction.reply({ content: `❗ ${user.tag} zaten whitelist'te.`, ephemeral: true });
+        return interaction.reply({ content: `❗ ${user.tag} zaten whitelist'te.`, ephemeral: false });
       }
 
       settings.whitelist.push(user.id);
       await settings.save();
-      return interaction.reply({ content: `✅ ${user.tag} başarıyla whitelist'e eklendi.`, ephemeral: true });
+      return interaction.reply({ content: `✅ ${user.tag} başarıyla whitelist'e eklendi.`, ephemeral: false });
     }
 
     // ❌ Kullanıcı Kaldır
     if (sub === 'kaldır') {
       const user = interaction.options.getUser('kullanıcı');
       if (!settings.whitelist.includes(user.id)) {
-        return interaction.reply({ content: `❗ ${user.tag} whitelist'te değil.`, ephemeral: true });
+        return interaction.reply({ content: `❗ ${user.tag} whitelist'te değil.`, ephemeral: false });
       }
 
       settings.whitelist = settings.whitelist.filter(id => id !== user.id);
       await settings.save();
-      return interaction.reply({ content: `🗑️ ${user.tag} whitelist'ten kaldırıldı.`, ephemeral: true });
+      return interaction.reply({ content: `🗑️ ${user.tag} whitelist'ten kaldırıldı.`, ephemeral: false });
     }
 
     // 📋 Listele
     if (sub === 'liste') {
       if (settings.whitelist.length === 0) {
-        return interaction.reply({ content: `📭 Whitelist boş.`, ephemeral: true });
+        return interaction.reply({ content: `📭 Whitelist boş.`, ephemeral: false });
       }
 
       const list = settings.whitelist
