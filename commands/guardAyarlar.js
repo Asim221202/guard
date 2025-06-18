@@ -1,5 +1,5 @@
 const { SlashCommandBuilder, EmbedBuilder } = require('discord.js');
-const GuardSettings = require('../../models/GuardSettings');
+const GuardSettings = require('../models/GuardSettings');
 
 module.exports = {
   data: new SlashCommandBuilder()
