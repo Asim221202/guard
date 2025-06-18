@@ -26,20 +26,20 @@ module.exports = {
 
     if (sub === 'aç') {
       if (settings.kanalKoruma) {
-        return interaction.reply({ content: '❗ Kanal koruması zaten açık.', ephemeral: true });
+        return interaction.reply({ content: '❗ Kanal koruması zaten açık.', ephemeral: false });
       }
       settings.kanalKoruma = true;
       await settings.save();
-      return interaction.reply({ content: '✅ Kanal koruması başarıyla **açıldı**.', ephemeral: true });
+      return interaction.reply({ content: '✅ Kanal koruması başarıyla **açıldı**.', ephemeral: false });
     }
 
     if (sub === 'kapat') {
       if (!settings.kanalKoruma) {
-        return interaction.reply({ content: '❗ Kanal koruması zaten kapalı.', ephemeral: true });
+        return interaction.reply({ content: '❗ Kanal koruması zaten kapalı.', ephemeral: false });
       }
       settings.kanalKoruma = false;
       await settings.save();
-      return interaction.reply({ content: '❌ Kanal koruması başarıyla **kapatıldı**.', ephemeral: true });
+      return interaction.reply({ content: '❌ Kanal koruması başarıyla **kapatıldı**.', ephemeral: false });
     }
   }
 };
