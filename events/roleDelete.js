@@ -1,58 +1,57 @@
-const { AuditLogEvent } = require('discord.js');
+const { EmbedBuilder, AuditLogEvent, PermissionsBitField } = require('discord.js');
 const GuardSettings = require('../models/GuardSettings');
-const isSafe = require('../utils/isSafe');
-const sendGuardLog = require('../utils/sendGuardLog');
 
 module.exports = {
-  name: 'roleDelete',
-  async execute(role, client) {
-    const guild = role.guild;
-    if (!guild) return;
+  name: 'roleGuard',
+  async execute(client) {
+    client.on('roleUpdate', async (oldRole, newRole) => {
+      const guild = newRole.guild;
+      if (!guild) return;
 
-    const settings = await GuardSettings.findOne({ guildID: guild.id });
-    if (!settings?.rolKoruma || !settings.logChannelID) return;
+      const settings = await GuardSettings.findOne({ guildID: guild.id });
+      if (!settings?.rolKoruma || !settings.logChannelID) return;
 
-    try {
-      const logs = await guild.fetchAuditLogs({ type: AuditLogEvent.RoleDelete, limit: 1 });
-      const entry = logs.entries.first();
-      if (!entry) return;
+      const logChannel = guild.channels.cache.get(settings.logChannelID);
+      if (!logChannel) return;
 
-      const { executor, target } = entry;
-      if (!executor || executor.id === client.user.id || target.id !== role.id) return;
+      // İzin değişikliklerini bulalım
+      const oldPerms = new PermissionsBitField(oldRole.permissions.bitfield);
+      const newPerms = new PermissionsBitField(newRole.permissions.bitfield);
 
-      const safe = await isSafe(guild, executor.id, settings);
+      // Tüm izinleri kontrol et
+      const allPerms = Object.keys(PermissionsBitField.Flags);
+      let changes = [];
 
-      if (!safe) {
-        try {
-          await guild.members.ban(executor.id, {
-            reason: 'Rol koruma: izinsiz rol silme'
-          });
-        } catch (err) {
-          console.error('[GUARD] Rol silen kişiyi banlayamadım:', err);
+      for (const perm of allPerms) {
+        const oldHas = oldPerms.has(PermissionsBitField.Flags[perm]);
+        const newHas = newPerms.has(PermissionsBitField.Flags[perm]);
+        if (oldHas !== newHas) {
+          changes.push(`${perm}: ${oldHas ? 'KAPALI ➡️ AÇIK' : 'AÇIK ➡️ KAPALI'}`);
         }
-
-        await sendGuardLog(guild, settings, {
-          title: '🚨 Rol Silindi - Banlandı',
-          description: `${executor.tag} adlı kişi izinsiz bir rol sildiği için banlandı.`,
-          fields: [
-            { name: 'Silinen Rol', value: `${role.name} (${role.id})` },
-            { name: 'Silen Kişi', value: `${executor.tag} (${executor.id})` }
-          ],
-          color: 0xff0000
-        });
-      } else {
-        await sendGuardLog(guild, settings, {
-          title: '⚠️ Rol Silindi (Whitelist)',
-          description: `${executor.tag} adlı kişi bir rol sildi, ancak whitelist'te olduğu için işlem yapılmadı.`,
-          fields: [
-            { name: 'Silinen Rol', value: `${role.name} (${role.id})` }
-          ],
-          color: 0xf1c40f
-        });
       }
 
-    } catch (err) {
-      console.error('[GUARD] roleDelete log hatası:', err);
-    }
+      if (changes.length === 0) return; // İzin değişikliği yoksa çık
+
+      // Audit logdan yetkiliyi bul
+      let executorTag = 'Bilinmiyor';
+      try {
+        const logs = await guild.fetchAuditLogs({ type: AuditLogEvent.RoleUpdate, limit: 5 });
+        const entry = logs.entries.find(e => e.target.id === newRole.id);
+        if (entry) executorTag = entry.executor.tag;
+      } catch {}
+
+      const embed = new EmbedBuilder()
+        .setTitle('⚠️ Rol İzinleri Güncellendi')
+        .setColor('Orange')
+        .setDescription(`**${newRole.name}** rolündeki izin değişiklikleri:`)
+        .addFields(
+          { name: 'Yetkili', value: executorTag, inline: true },
+          { name: 'Rol ID', value: newRole.id, inline: true },
+          { name: `Değişen İzinler (${changes.length})`, value: changes.join('\n').slice(0, 1024) }
+        )
+        .setTimestamp();
+
+      logChannel.send({ embeds: [embed] }).catch(() => {});
+    });
   }
 };
